@@ -137,7 +137,7 @@ for (var key in Camera) {
  * @param {module:camera.onError} errorCallback
  * @param {module:camera.CameraOptions} options CameraOptions
  */
-cameraExport.getPicture = function(successCallback, errorCallback, options) {
+/*cameraExport.getPicture = function(successCallback, errorCallback, options) {
     argscheck.checkArgs('fFO', 'Camera.getPicture', arguments);
     options = options || {};
     var getValue = argscheck.getValue;
@@ -161,7 +161,40 @@ cameraExport.getPicture = function(successCallback, errorCallback, options) {
     exec(successCallback, errorCallback, "Camera", "takePicture", args);
     // XXX: commented out
     //return new CameraPopoverHandle();
+};*/
+
+// Promise-based API: Version 1
+cameraExport.getPicture = function(options) {
+    // ToDO: What if validation fails here ?
+    argscheck.checkArgs('fFO', 'Camera.getPicture', arguments);
+    options = options || {};
+    var getValue = argscheck.getValue;
+
+    var quality = getValue(options.quality, 50);
+    var destinationType = getValue(options.destinationType, Camera.DestinationType.FILE_URI);
+    var sourceType = getValue(options.sourceType, Camera.PictureSourceType.CAMERA);
+    var targetWidth = getValue(options.targetWidth, -1);
+    var targetHeight = getValue(options.targetHeight, -1);
+    var encodingType = getValue(options.encodingType, Camera.EncodingType.JPEG);
+    var mediaType = getValue(options.mediaType, Camera.MediaType.PICTURE);
+    var allowEdit = !!options.allowEdit;
+    var correctOrientation = !!options.correctOrientation;
+    var saveToPhotoAlbum = !!options.saveToPhotoAlbum;
+    var popoverOptions = getValue(options.popoverOptions, null);
+    var cameraDirection = getValue(options.cameraDirection, Camera.Direction.BACK);
+
+    var args = [quality, destinationType, sourceType, targetWidth, targetHeight, encodingType,
+                mediaType, allowEdit, correctOrientation, saveToPhotoAlbum, popoverOptions, cameraDirection];
+                
+    return exec("Camera", "takePicture", args);
 };
+
+// Promise-based API: Version 2
+/*cameraExport.takePicture2 = function(options) {
+    return new Promise(function(resolve, reject) {
+        exec(resolve, reject, "Camera", "takePicture", args);
+    });
+};*/
 
 /**
  * Removes intermediate image files that are kept in temporary storage
